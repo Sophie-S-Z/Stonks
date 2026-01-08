@@ -6,6 +6,17 @@ A data-driven stock screener that analyzes Dow 30 stocks using technical indicat
 
 This project evaluates 30 major stocks from the Dow Jones Industrial Average based on multiple technical indicators and combines them into a comprehensive scoring system. The screener uses recent market data (from 2025-01-01 onwards) to calculate momentum, trend, and volume signals.
 
+## Quick Start
+
+If you're in a hurry:
+
+1. **Clone/download** the repo
+2. **Create virtual environment**: `python -m venv .venv && .venv\Scripts\activate` (Windows) or `python3 -m venv .venv && source .venv/bin/activate` (Mac/Linux)
+3. **Install packages**: `pip install -r requirements.txt`
+4. **Run screener**: `python stock_screener.py`
+
+That's it! Results will display in your terminal and be saved as CSV + PNG charts.
+
 ## Features
 
 - **Multi-Factor Analysis**: Combines three complementary scoring metrics:
@@ -35,31 +46,56 @@ This project evaluates 30 major stocks from the Dow Jones Industrial Average bas
 
 ## Installation
 
-1. Clone or download the repository
-2. Create a virtual environment:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install pandas numpy yfinance TA-Lib matplotlib seaborn
-   ```
+### 1. Clone or Download the Repository
+Download this project or clone it from the repository link.
+
+### 2. Create a Virtual Environment (Recommended)
+
+**On Windows:**
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+**On macOS/Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+> **Note on TA-Lib**: If you encounter issues installing TA-Lib, refer to the [TA-Lib installation guide](https://github.com/mrjbq7/ta-lib#installation). It requires a compiled C library.
 
 ## Usage
 
-Open the Jupyter notebook and run all cells:
+You can run the stock screener in two ways:
+
+### Option 1: Run the Python Script (Easiest)
+
+```bash
+python stock_screener.py
+```
+
+This will:
+- Download historical data for all 30 Dow stocks
+- Calculate scores for all stocks
+- Display results in the terminal
+- Generate and display visualizations
+- Save results to a timestamped CSV file
+- Save chart images (bar_chart.png and heatmap.png)
+
+### Option 2: Run the Jupyter Notebook
 
 ```bash
 jupyter notebook "Stock Market Screener.ipynb"
 ```
 
-The notebook will:
-1. Download historical data for all 30 Dow stocks
-2. Calculate individual scoring metrics for each stock
-3. Compute final composite scores
-4. Generate visualizations (bar chart and heatmap)
-5. Display detailed scoring results in a DataFrame
+Then run all cells in order. The notebook provides the same functionality with interactive exploration capabilities.
 
 ## Scoring Methodology
 
@@ -82,27 +118,97 @@ Combines volume and price action:
 
 ## Output
 
-The screener produces:
-- **Data Table**: DataFrame with individual scores (ma50_score, rsi_score, vol_score) and final_score for each ticker
-- **Bar Chart**: Final scores ranked by ticker for easy comparison
-- **Heatmap**: Color-coded grid view showing all stocks and their scores at a glance
+The screener produces three types of output:
 
-## Notes
+### 1. Terminal Output
+- Displays all stock scores in a formatted table
+- Shows progress as data is downloaded and calculated
 
-- All scores range from -1 (bearish) to +1 (bullish)
-- The final_score is the arithmetic mean of the three component scores
-- Higher scores suggest better momentum and trend alignment
-- This is a technical analysis tool and should not be used as sole investment advice
-- Historical data is auto-adjusted for stock splits and dividends
+### 2. CSV Report
+- Automatically saved as `stock_screener_results_YYYYMMDD_HHMMSS.csv`
+- Contains all individual scores and final composite scores
+- Can be imported into Excel or other tools for further analysis
+
+### 3. Visualizations
+- **Bar Chart** (`stock_screener_bar_chart.png`): Final scores ranked by ticker for easy comparison
+- **Heatmap** (`stock_screener_heatmap.png`): Color-coded grid view showing all stocks and their scores at a glance
+
+## Output Files
+
+After running the screener, you'll find these files in the project directory:
+
+```
+stock_screener_results_20260107_123456.csv      # Results data (timestamp varies)
+stock_screener_bar_chart.png                     # Bar chart visualization
+stock_screener_heatmap.png                       # Heatmap visualization
+```
+
+## Customization
+
+You can easily customize the screener by editing `stock_screener.py`:
+
+```python
+# Change the date range
+START_DATE = '2025-01-01'
+END_DATE = '2026-01-07'
+
+# Modify the stock list
+TICKERS = {"AAPL", "MSFT", "GOOGL", ...}
+
+# Adjust scoring weights in the scoring functions
+# For example, in ma50_score():
+score = 0.5 * dist_score + 0.3 * slope_score + 0.2 * regime
+```
+
+## Troubleshooting
+
+**Q: I get a TA-Lib installation error**
+- A: TA-Lib requires a compiled C library. See [TA-Lib GitHub](https://github.com/mrjbq7/ta-lib) for platform-specific installation instructions.
+
+**Q: yfinance download is slow or fails**
+- A: This can happen during peak hours. The script includes multi-threading, but you can increase retry attempts by modifying the `download_data()` function.
+
+**Q: I get "module not found" errors**
+- A: Make sure you activated your virtual environment and ran `pip install -r requirements.txt`.
+
+**Q: Charts don't display**
+- A: If running on a headless server, comment out `plt.show()` lines in the script. Charts are still saved as PNG files.
+
+## Project Files
+
+```
+Stock Market Screener/
+├── Stock Market Screener.ipynb    # Main interactive notebook
+├── stock_screener.py              # Standalone Python script
+├── requirements.txt               # Python dependencies
+├── README.md                      # This file
+├── .gitignore                     # Git ignore rules
+└── stock_screener_results_*.csv   # Generated reports (after running)
+```
+
+## Important Notes
+
+- **Score Range**: All scores range from -1 (bearish) to +1 (bullish)
+- **Final Score Calculation**: The final_score is the arithmetic mean of the three component scores
+- **Interpretation**: Higher scores suggest better momentum and trend alignment
+- **Disclaimer**: This is a technical analysis tool and should not be used as the sole basis for investment decisions
+- **Data Quality**: Historical data is auto-adjusted for stock splits and dividends
+- **Real-Time Usage**: This screener uses daily data; for intraday trading, modify the data frequency in `stock_screener.py`
 
 ## Future Enhancements
 
 - Additional indicators (Bollinger Bands, MACD, Stochastic Oscillator)
 - Sector-based filtering and comparison
-- Customizable date ranges
+- Fully customizable date ranges via command-line arguments
 - Integration with broader market indices
-- Machine learning-based scoring weights
-- Real-time alerts for score changes
+- Machine learning-based dynamic scoring weights
+- Real-time alerts for significant score changes
+- Web-based dashboard for interactive exploration
+- Integration with brokerage APIs
+
+## Contributing
+
+Found a bug or have an improvement? Feel free to fork and submit a pull request.
 
 ## Author
 
@@ -110,4 +216,4 @@ Created as part of quantitative stock analysis research.
 
 ## License
 
-Personal use project.
+Personal use project. Feel free to modify and share for personal investment research.
